@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="github.daneren2005.serverproxy">
+
+	<uses-sdk android:targetSdkVersion="19"
+		android:minSdkVersion="8" />
+
+</manifest>
