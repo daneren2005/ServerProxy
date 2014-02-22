@@ -108,7 +108,6 @@ public class FileProxy extends ServerProxy {
 
 			headers += "Connection: close\r\n";
 			headers += "\r\n";
-			Log.d(TAG, headers);
 
 			long cbToSend = fileSize - cbSkip;
 			OutputStream output = null;
