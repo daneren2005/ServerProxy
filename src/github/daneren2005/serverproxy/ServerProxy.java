@@ -51,7 +51,7 @@ public abstract class ServerProxy implements Runnable {
 	public ServerProxy(Context context) {
 		// Create listening socket
 		try {
-			socket = new ServerSocket(0, 0, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
+			socket = new ServerSocket(0);
 			socket.setSoTimeout(5000);
 			port = socket.getLocalPort();
 			this.context = context;
@@ -62,21 +62,23 @@ public abstract class ServerProxy implements Runnable {
 	}
 
 	public void start() {
-		thread = new Thread(this, "Socket Proxy");
-		thread.start();
+		if(socket.isBound()) {
+			thread = new Thread(this, "Socket Proxy");
+			thread.start();
+		} else {
+			Log.e(TAG, "Attempting to start a non-initialized proxy");
+		}
 	}
 
 	public void stop() {
 		isRunning = false;
-		thread.interrupt();
+		if(thread != null) {
+			thread.interrupt();
+		}
 	}
 
 	public String getPrivateAddress(String request) {
-		try {
-			return getAddress("127.0.0.1", URLEncoder.encode(request, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			return null;
-		}
+		return getAddress("127.0.0.1", request);
 	}
 	public String getPublicAddress(String request) {
 		WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -97,7 +99,11 @@ public abstract class ServerProxy implements Runnable {
 		return getAddress(ipAddressString, request);
 	}
 	private String getAddress(String host, String request) {
-		return String.format("http://%s:%d/%s", host, port, request);
+		try {
+			return String.format("http://%s:%d/%s", host, port, URLEncoder.encode(request, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
 	}
 
 	@Override
