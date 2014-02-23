@@ -95,7 +95,18 @@ public class FileProxy extends ServerProxy {
 
 				Log.i(TAG, "Streaming starts from: " + cbSkip);
 			}
-			headers += "Content-Type: " + "application/octet-stream" + "\r\n";
+
+			String name = file.getPath();
+			int index = name.lastIndexOf('.');
+			String ext = "";
+			if(index != -1) {
+				ext = name.substring(index + 1).toLowerCase();
+			}
+			if("mp3".equals(ext)) {
+				headers += "Content-Type: audio/mpeg\r\n";
+			} else {
+				headers += "Content-Type: " + "application/octet-stream" + "\r\n";
+			}
 
 			long fileSize;
 			if(contentLength == null) {
@@ -103,6 +114,7 @@ public class FileProxy extends ServerProxy {
 			} else {
 				fileSize = contentLength;
 				headers += "Content-Length: " + fileSize + "\r\n";
+				headers += "Accept-Ranges: bytes";
 			}
 			Log.i(TAG, "Streaming fileSize: " + fileSize);
 
