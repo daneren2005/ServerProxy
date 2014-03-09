@@ -114,7 +114,7 @@ public class FileProxy extends ServerProxy {
 			} else {
 				fileSize = contentLength;
 				headers += "Content-Length: " + fileSize + "\r\n";
-				headers += "Accept-Ranges: bytes";
+				headers += "Accept-Ranges: bytes \r\n";
 			}
 			Log.i(TAG, "Streaming fileSize: " + fileSize);
 
