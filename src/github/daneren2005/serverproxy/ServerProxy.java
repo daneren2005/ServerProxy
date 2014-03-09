@@ -137,6 +137,7 @@ public abstract class ServerProxy implements Runnable {
 		protected Socket client;
 		protected String path;
 		protected int cbSkip = 0;
+		protected HttpRequest request;
 
 		public ProxyTask(Socket client) {
 			this.client = client;
@@ -183,7 +184,7 @@ public abstract class ServerProxy implements Runnable {
 		}
 
 		public boolean processRequest() {
-			HttpRequest request = readRequest();
+			request = readRequest();
 			if (request == null) {
 				return false;
 			}
