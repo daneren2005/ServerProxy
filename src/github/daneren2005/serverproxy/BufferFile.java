@@ -24,4 +24,5 @@ public interface BufferFile {
 	boolean isWorkDone();
 	void onStart();
 	void onStop();
+	void onResume();
 }

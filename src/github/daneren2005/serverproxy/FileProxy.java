@@ -133,6 +133,7 @@ public class FileProxy extends ServerProxy {
 
 				// Loop as long as there's stuff to send
 				while (isRunning && !client.isClosed()) {
+					onResume();
 
 					// See if there's more to send
 					int cbSentThisBatch = 0;
@@ -199,6 +200,9 @@ public class FileProxy extends ServerProxy {
 
 		}
 		public void onStop() {
+
+		}
+		public void onResume() {
 
 		}
 		public boolean isWorkDone() {

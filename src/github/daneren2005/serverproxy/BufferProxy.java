@@ -67,6 +67,10 @@ public class BufferProxy extends FileProxy {
 		public void onStop() {
 			progress.onStop();
 		}
+		@Override
+		public void onResume() {
+			progress.onResume();
+		}
 
 		@Override
 		public boolean isWorkDone() {
