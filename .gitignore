@@ -1,2 +1,4 @@
 gen/
 .idea/
+build/
+.gradle
