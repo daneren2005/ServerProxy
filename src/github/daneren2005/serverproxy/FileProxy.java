@@ -85,13 +85,14 @@ public class FileProxy extends ServerProxy {
 			if(cbSkip == 0) {
 				headers = "HTTP/1.0 200 OK\r\n";
 			} else {
-				headers = "HTTP/1.0 206 OK\r\n;";
+				headers = "HTTP/1.0 206 OK\r\n";
 				headers += "Content-Range: bytes " + cbSkip + "-" + (file.length() - 1) + "/";
 				if(contentLength == null) {
 					headers += "*";
 				} else {
 					headers += contentLength;
 				}
+				headers += "\r\n";
 
 				Log.i(TAG, "Streaming starts from: " + cbSkip);
 			}
@@ -113,7 +114,11 @@ public class FileProxy extends ServerProxy {
 				fileSize = getFileSize();
 			} else {
 				fileSize = contentLength;
-				headers += "Content-Length: " + fileSize + "\r\n";
+				if(cbSkip > 0) {
+					headers += "Content-Length: " + (fileSize - cbSkip) + "\r\n";
+				} else {
+					headers += "Content-Length: " + fileSize + "\r\n";
+				}
 				headers += "Accept-Ranges: bytes \r\n";
 			}
 			Log.i(TAG, "Streaming fileSize: " + fileSize);
