@@ -163,6 +163,10 @@ public abstract class ServerProxy implements Runnable {
 			}
 
 			StringTokenizer st = new StringTokenizer(firstLine);
+			if(!st.hasMoreTokens()) {
+				Log.w(TAG, "Unknown error with no tokens");
+				return request;
+			}
 			String method = st.nextToken();
 			String uri = st.nextToken();
 			String realUri = uri.substring(1);
