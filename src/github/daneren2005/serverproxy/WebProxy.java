@@ -19,6 +19,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -118,7 +119,12 @@ public class WebProxy extends ServerProxy {
 						output = new BufferedOutputStream(client.getOutputStream(), 64*1024);
 						output.write(getHeaderString(response.getStatusLine().getStatusCode(), headers).getBytes());
 
-						input = response.getEntity().getContent();
+						HttpEntity entity = response.getEntity();
+						if(entity == null) {
+							Log.w(TAG, "Failed to get entity for request: " + path);
+							return;
+						}
+						input = entity.getContent();
 
 						byte[] buffer = new byte[1024 * 32];
 						int count = 0, n= 0;
@@ -128,11 +134,20 @@ public class WebProxy extends ServerProxy {
 						}
 						output.flush();
 					} finally {
-						if(output != null) {
-							output.close();
+						try {
+							if (output != null) {
+								output.close();
+							}
+						} catch(Exception e) {
+							Log.w(TAG, "Error closing output stream");
 						}
-						if(input != null) {
-							input.close();
+
+						try {
+							if(input != null) {
+								input.close();
+							}
+						} catch(Exception e) {
+							Log.w(TAG, "Error closing input stream");
 						}
 					}
 				} else {
