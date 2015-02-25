@@ -20,27 +20,18 @@ import android.util.Log;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.RequestWrapper;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicHttpRequest;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -48,6 +39,7 @@ import java.util.List;
 
 public class WebProxy extends ServerProxy {
 	private static String TAG = WebProxy.class.getSimpleName();
+	private static List REMOVE_REQUEST_HEADERS = Arrays.asList("Host", "Accept-Encoding", "Referer");
 
 	public WebProxy(Context context) {
 		super(context);
@@ -101,14 +93,16 @@ public class WebProxy extends ServerProxy {
 			HttpResponse response;
 
 			try {
-				RequestWrapper newRequest = new RequestWrapper(request);
-				newRequest.setURI(new URI(path));
-				newRequest.removeHeaders("Host");
-				newRequest.removeHeaders("Accept-Encoding");
-				newRequest.removeHeaders("Referer");
+				HttpPost newRequest = new HttpPost(path);
+				for(Header header: request.getAllHeaders()) {
+					if(!REMOVE_REQUEST_HEADERS.contains(header.getName())) {
+						newRequest.addHeader(header);
+					}
+				}
+
 				response = httpclient.execute(newRequest);
 				StatusLine status = response.getStatusLine();
-				if(status.getStatusCode() == HttpStatus.SC_OK) {
+				if(status.getStatusCode() == HttpStatus.SC_OK || status.getStatusCode() == HttpStatus.SC_PARTIAL_CONTENT) {
 					headers = new ArrayList<Header>();
 					headers.addAll(Arrays.asList(response.getAllHeaders()));
 					headers = getHeaders(headers);
