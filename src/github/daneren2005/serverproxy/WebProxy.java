@@ -40,6 +40,7 @@ import java.util.List;
 public class WebProxy extends ServerProxy {
 	private static String TAG = WebProxy.class.getSimpleName();
 	private static List REMOVE_REQUEST_HEADERS = Arrays.asList("Host", "Accept-Encoding", "Referer");
+	private static List REMOVE_RESPONSE_HEADERS = Arrays.asList("Transfer-Encoding");
 
 	public WebProxy(Context context) {
 		super(context);
@@ -76,11 +77,30 @@ public class WebProxy extends ServerProxy {
 			sb.append(response);
 			sb.append(" OK\r\n");
 
+			boolean addContentType = true;
 			for(Header header: headers) {
+				if(REMOVE_RESPONSE_HEADERS.contains(header.getName())) {
+					continue;
+				}
+
 				sb.append(header.getName());
 				sb.append(": ");
-				sb.append(header.getValue());
+
+				// Make sure that connection is close, not keep-alive
+				if("Connection".equals(header.getName())) {
+					sb.append("close");
+				} else {
+					sb.append(header.getValue());
+				}
+
+				if("Content-Type".equals(header.getName())) {
+					addContentType = false;
+				}
+
 				sb.append("\r\n");
+			}
+			if(addContentType) {
+				sb.append("Content-Type: application/octet-stream\r\n");
 			}
 			sb.append("\r\n");
 
