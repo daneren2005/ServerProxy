@@ -41,9 +41,15 @@ public class WebProxy extends ServerProxy {
 	private static String TAG = WebProxy.class.getSimpleName();
 	private static List REMOVE_REQUEST_HEADERS = Arrays.asList("Host", "Accept-Encoding", "Referer");
 	private static List REMOVE_RESPONSE_HEADERS = Arrays.asList("Transfer-Encoding");
+	private HttpClient httpClient;
 
 	public WebProxy(Context context) {
 		super(context);
+	}
+	public WebProxy(Context context, HttpClient httpClient) {
+		super(context);
+
+		this.httpClient = httpClient;
 	}
 
 	@Override
@@ -109,7 +115,12 @@ public class WebProxy extends ServerProxy {
 
 		@Override
 		public void run() {
-			HttpClient httpclient = new DefaultHttpClient();
+			HttpClient httpClient;
+			if(WebProxy.this.httpClient != null) {
+				httpClient = WebProxy.this.httpClient;
+			} else {
+				httpClient = new DefaultHttpClient();
+			}
 			HttpResponse response;
 
 			try {
@@ -120,7 +131,7 @@ public class WebProxy extends ServerProxy {
 					}
 				}
 
-				response = httpclient.execute(newRequest);
+				response = httpClient.execute(newRequest);
 				StatusLine status = response.getStatusLine();
 				if(status.getStatusCode() == HttpStatus.SC_OK || status.getStatusCode() == HttpStatus.SC_PARTIAL_CONTENT) {
 					headers = new ArrayList<Header>();
