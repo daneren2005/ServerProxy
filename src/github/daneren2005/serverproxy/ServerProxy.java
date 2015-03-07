@@ -176,9 +176,12 @@ public abstract class ServerProxy implements Runnable {
 			try {
 				String line;
 				while((line = reader.readLine()) != null && !"".equals(line)) {
-					String headerName = line.substring(0, line.indexOf(':'));
-					String headerValue = line.substring(line.indexOf(": ") + 2);
-					request.addHeader(headerName, headerValue);
+					int index = line.indexOf(':');
+					if(index != -1) {
+						String headerName = line.substring(0, index);
+						String headerValue = line.substring(index + 2);
+						request.addHeader(headerName, headerValue);
+					}
 				}
 			} catch(IOException e) {
 				// Don't really care once past first line
