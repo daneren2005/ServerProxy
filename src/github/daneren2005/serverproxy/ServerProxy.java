@@ -164,7 +164,10 @@ public abstract class ServerProxy implements Runnable {
 
 			StringTokenizer st = new StringTokenizer(firstLine);
 			if(!st.hasMoreTokens()) {
-				Log.w(TAG, "Unknown error with no tokens");
+				Log.w(TAG, "Unknown request with no tokens");
+				return request;
+			} else if(st.countTokens() < 2) {
+				Log.w(TAG, "Unknown request with no uri: \"" + firstLine + '"');
 				return request;
 			}
 			String method = st.nextToken();
@@ -177,7 +180,8 @@ public abstract class ServerProxy implements Runnable {
 				String line;
 				while((line = reader.readLine()) != null && !"".equals(line)) {
 					int index = line.indexOf(':');
-					if(index != -1) {
+					// Ignore headers without ':' or where ':' is the last thing in the string
+					if(index != -1 && (index + 2) < line.length()) {
 						String headerName = line.substring(0, index);
 						String headerValue = line.substring(index + 2);
 						request.addHeader(headerName, headerValue);
@@ -185,6 +189,8 @@ public abstract class ServerProxy implements Runnable {
 				}
 			} catch(IOException e) {
 				// Don't really care once past first line
+			} catch(Exception e) {
+				Log.w(TAG, "Exception reading request", e);
 			}
 
 			return request;
