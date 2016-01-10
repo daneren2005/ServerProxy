@@ -39,7 +39,7 @@ import java.util.List;
 
 public class WebProxy extends ServerProxy {
 	private static String TAG = WebProxy.class.getSimpleName();
-	private static List REMOVE_REQUEST_HEADERS = Arrays.asList("Host", "Accept-Encoding", "Referer");
+	private static List REMOVE_REQUEST_HEADERS = Arrays.asList("Host", "Accept-Encoding", "Referer", "Content-Length");
 	private static List REMOVE_RESPONSE_HEADERS = Arrays.asList("Transfer-Encoding");
 	private HttpClient httpClient;
 
