@@ -128,7 +128,6 @@ public class WebProxy extends ServerProxy {
 					if(!REMOVE_REQUEST_HEADERS.contains(header.getName()) && !(header.getName().equals("Content-Length") && header.getValue().equals("0"))  ) {
 						newRequest.addHeader(header);
 					}
-
 				}
 
 				response = httpClient.execute(newRequest);
