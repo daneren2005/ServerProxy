@@ -39,7 +39,7 @@ import java.util.List;
 
 public class WebProxy extends ServerProxy {
 	private static String TAG = WebProxy.class.getSimpleName();
-	private static List REMOVE_REQUEST_HEADERS = Arrays.asList("Host", "Accept-Encoding", "Referer", "Content-Length");
+	private static List REMOVE_REQUEST_HEADERS = Arrays.asList("Host", "Accept-Encoding", "Referer");
 	private static List REMOVE_RESPONSE_HEADERS = Arrays.asList("Transfer-Encoding");
 	private HttpClient httpClient;
 
@@ -122,13 +122,13 @@ public class WebProxy extends ServerProxy {
 				httpClient = new DefaultHttpClient();
 			}
 			HttpResponse response;
-
 			try {
-				HttpPost newRequest = new HttpPost(path);
+                HttpPost newRequest = new HttpPost(path);
 				for(Header header: request.getAllHeaders()) {
-					if(!REMOVE_REQUEST_HEADERS.contains(header.getName())) {
+					if(!REMOVE_REQUEST_HEADERS.contains(header.getName()) && !(header.getName().equals("Content-Length") && header.getValue().equals("0"))  ) {
 						newRequest.addHeader(header);
 					}
+
 				}
 
 				response = httpClient.execute(newRequest);
