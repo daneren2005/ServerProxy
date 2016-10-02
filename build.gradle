@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
 
     dependencies {
@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'android-library'
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {
