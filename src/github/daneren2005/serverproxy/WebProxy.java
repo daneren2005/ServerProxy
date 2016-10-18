@@ -31,18 +31,22 @@ import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 
 public class WebProxy extends ServerProxy {
 	private static String TAG = WebProxy.class.getSimpleName();
 	private static List REMOVE_REQUEST_HEADERS = Arrays.asList("Host", "Accept-Encoding", "Referer");
 	private static List REMOVE_RESPONSE_HEADERS = Arrays.asList("Transfer-Encoding");
+	private SSLSocketFactory sslSocketFactory;
 	private HostnameVerifier hostnameVerifier;
 
 	public WebProxy(Context context) {
 		super(context);
 	}
-	public WebProxy(Context context, HostnameVerifier hostnameVerifier) {
+	public WebProxy(Context context, SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
 		super(context);
+		this.sslSocketFactory = sslSocketFactory;
 		this.hostnameVerifier = hostnameVerifier;
 	}
 
@@ -123,6 +127,17 @@ public class WebProxy extends ServerProxy {
 				for(Map.Entry<String, String> header: requestHeaders.entrySet()) {
 					if(!REMOVE_REQUEST_HEADERS.contains(header.getKey()) && !("Content-Length".equals(header.getKey()) && "0".equals(header.getValue()))  ) {
 						connection.setRequestProperty(header.getKey(), header.getValue());
+					}
+				}
+				if(connection instanceof HttpsURLConnection) {
+					HttpsURLConnection sslConnection = (HttpsURLConnection) connection;
+
+					if(sslSocketFactory != null) {
+						sslConnection.setSSLSocketFactory(sslSocketFactory);
+					}
+
+					if(hostnameVerifier != null) {
+						sslConnection.setHostnameVerifier(hostnameVerifier);
 					}
 				}
 
